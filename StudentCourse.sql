@@ -1,0 +1,123 @@
+--CREATE DB
+DROP DATABASE IF EXISTS StudentCourse
+GO
+
+CREATE DATABASE StudentCourse
+GO
+
+USE StudentCourse
+
+--CREATE TABLE
+CREATE TABLE [Student] (
+	SID integer NOT NULL,
+	S_FName varchar(20) NOT NULL,
+	S_LName varchar(30) NOT NULL,
+  CONSTRAINT [PK_STUDENT] PRIMARY KEY CLUSTERED
+  (
+  [SID] ASC
+  ) WITH (IGNORE_DUP_KEY = OFF)
+
+)
+GO
+CREATE TABLE [Course_Grades] (
+	CGID integer NOT NULL,
+	Semester varchar(4) NOT NULL,
+	CID integer NOT NULL,
+	SID integer NOT NULL,
+	Grade varchar(2) NOT NULL,
+  CONSTRAINT [PK_COURSE_GRADES] PRIMARY KEY CLUSTERED
+  (
+  [CGID] ASC
+  ) WITH (IGNORE_DUP_KEY = OFF)
+
+)
+GO
+CREATE TABLE [Course] (
+	CID integer NOT NULL,
+	C_Name varchar(30) NOT NULL,
+  CONSTRAINT [PK_COURSE] PRIMARY KEY CLUSTERED
+  (
+  [CID] ASC
+  ) WITH (IGNORE_DUP_KEY = OFF)
+
+)
+GO
+
+ALTER TABLE [Course_Grades] WITH CHECK ADD CONSTRAINT [Course_Grades_fk0] FOREIGN KEY ([CID]) REFERENCES [Course]([CID])
+ON UPDATE CASCADE
+GO
+ALTER TABLE [Course_Grades] CHECK CONSTRAINT [Course_Grades_fk0]
+GO
+ALTER TABLE [Course_Grades] WITH CHECK ADD CONSTRAINT [Course_Grades_fk1] FOREIGN KEY ([SID]) REFERENCES [Student]([SID])
+ON UPDATE CASCADE
+GO
+ALTER TABLE [Course_Grades] CHECK CONSTRAINT [Course_Grades_fk1]
+GO
+
+--INSERT
+INSERT INTO Student VALUES
+(12345, 'Chris', 'Rock'),
+(23456, 'Chris', 'Farley'),
+(34567, 'David', 'Spade'),
+(45678, 'Liz', 'Lemon'),
+(56789, 'Jack', 'Donaghy')
+GO
+
+INSERT INTO Course VALUES
+(101001, 'Intro to Computers'),
+(101002, 'Programming'),
+(101003, 'Databases'),
+(101004, 'Websites'),
+(101005, 'IS Management')
+GO
+
+INSERT INTO Course_Grades VALUES
+(2010101, 'SP10', '101005', 34567, 'D+'),
+(2010308, 'FA10', '101005', 34567, 'A-'),
+(2010309, 'FA10', '101001', 45678, 'B+'),
+(2011308, 'FA11', '101003', 23456, 'B-'),
+(2012206, 'SU12', '101002', 56789, 'A+')
+GO
+
+--CHANGE THE MAXIMUM LENGTH FOR STUDENT FIRST NAMES TO BE 30 CHARACTERS LONG
+ALTER TABLE Student ALTER COLUMN S_FName varchar(30) NOT NULL
+GO
+--ADD COLUMN Faculty_LName CAN VARY UP TO 30 CHARACTERS LONG. CAN'T BE NULL AND DEFAULT VALUE SHOULD BE 'TBD'
+ALTER TABLE [Course] ADD Faculty_LName varchar(30) NOT NULL DEFAULT 'TBD'
+GO
+
+--UPDATE CID 101001
+UPDATE Course
+SET C_Name = 'Intro to Wizadry', Faculty_LName = 'Potter'
+WHERE CID = '101001'
+GO
+
+--CHANGE THE COLUMN NAME C_Name TO BE Course_Name
+EXEC sp_rename 'Course.C_Name', 'Course_Name', 'COLUMN';
+GO
+
+--DELETE THE Websites CLASS FROM THE COURSE TABLE
+DELETE FROM Course
+WHERE Course_Name = 'Websites'
+GO
+
+/* REMOVE THE STUDENT TABLE FROM THE DB
+ DROP TABLE Student
+*/
+
+/* REMOVE ALL THE DATA FROM THE COURSE TABLE, BUT RETAIN THE TABLE STRUCTURE
+ TRUNCATE TABLE Course
+*/
+
+--REMOVE THE FOREIGN KEY CONSTRAINTS FROM CID AND SID COLUMNS IN THE Course_Grades TABLE
+ALTER TABLE Course_Grades
+DROP CONSTRAINT Course_Grades_fk0, Course_Grades_fk1
+GO
+
+--RESULTS
+SELECT * FROM Student
+GO
+SELECT * FROM Course
+GO
+SELECT * FROM Course_Grades
+GO
